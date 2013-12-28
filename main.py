@@ -7,16 +7,15 @@ from OpenGL.GLUT import *
 from OpenGL.GL.shaders import *
 from math import *
 import time, sys
-program = None
 
 import PIL.Image
 import numpy
 import time
 import sys
 
-
 from shaders import *
 from textures import *
+from controls import *
 
 
 
@@ -48,10 +47,11 @@ stationary_camera_autolock = True
 SCALE_CONSTANT = 1
 ##############################################################
 
-####################### TEXTURES #############################
+####################### TEXTURES AND PROGRAM #############################
 grassTex = None
 platformTex = None
-##############################################################
+program = None
+##########################################################################
   
 def initGL(w, h):
     glClearColor(skyR, skyG, skyB, skyA)
@@ -62,15 +62,11 @@ def initGL(w, h):
 
     helicopterTime = time.time()
     update_timer = time.time()
-
  
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-
     gluPerspective(visField, float(w)/float(h), 0.1, 700.0)
- 
     glMatrixMode(GL_MODELVIEW)
-
     glEnable(GL_DEPTH_TEST)
 
 
@@ -434,27 +430,9 @@ def keyPressed(*args):
 		printHelp()
 	if args[0].lower() == 'p':
 		pause = not pause
-	if args[0].lower() == 'g' and camera_mode == "stationary":
-		stationary_camera_autolock = True
 
 
 
-def printHelp():
-	print "Key Guide:"
-	print "Press 'h' to print this help message again."
-	print "Press 't' to toggle between 0.5x, 1x, 2x, 4x, and 8x speeds."
-	print "Press 'p' to pause / resume."
-	print "Press 'a' to stride the camera left."
-	print "Press 'd' to stride the camera right."
-
-	if camera_mode == "follow":
-		print "Press 'z' to zoom out."
-		print "Press 'x' to zoom in."
-	else:
-		print "Press 'g' to autolock onto the helicopter."
-
-	print "Press 'ESC' to quit."
-	print ""
 
 def idleFunc():
 	glutPostRedisplay()
@@ -505,7 +483,7 @@ def main():
 			exit(1)
 		i += 2
 
-
+	loadKeys()
 	printHelp()
 
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
