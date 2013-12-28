@@ -8,7 +8,7 @@ def loadKeys():
 	keyHash['right'] = 'd'
 	keyHash['zoomout'] = 'z'
 	keyHash['zoomin'] = 'x'
-	keyHash['quit'] = 'ESC'
+	keyHash['quit'] = 'q'
 
 
 def printHelp():

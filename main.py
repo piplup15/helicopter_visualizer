@@ -412,26 +412,26 @@ def animateHelicopter():
 
 def keyPressed(*args):
 	global camera_degrees, zoom, speed, pause, stationary_camera_autolock
-	if ord(args[0]) == 27: # Escape character
+	#if ord(args[0]) == 27: # Escape character
+	#	sys.exit()
+	if args[0].lower() == keyHash['quit']:
 		sys.exit()
-	if args[0].lower() == 'a':
+	if args[0].lower() == keyHash['left']:
 		camera_degrees -= 3
-	if args[0].lower() == 'd':
+	if args[0].lower() == keyHash['right']:
 		camera_degrees += 3
-	if args[0].lower() == 'z':
+	if args[0].lower() == keyHash['zoomout']:
 		zoom += 0.02
 		if zoom > max_zoom: zoom = max_zoom
-	if args[0].lower() == 'x':
+	if args[0].lower() == keyHash['zoomin']:
 		zoom -= 0.02
 		if zoom < min_zoom: zoom = min_zoom
-	if args[0].lower() == 't':
+	if args[0].lower() == keyHash['speed']:
 		speed = (2*speed) % 31
-	if args[0].lower() == 'h':
+	if args[0].lower() == keyHash['help']:
 		printHelp()
-	if args[0].lower() == 'p':
+	if args[0].lower() == keyHash['pause']:
 		pause = not pause
-
-
 
 
 def idleFunc():
@@ -497,13 +497,10 @@ def main():
 	glutIdleFunc(idleFunc)
 	glutReshapeFunc(resize)
 	glutKeyboardFunc(keyPressed)
-
 	initGL(screenW, screenH)
-
 	glUseProgram(program)  
 	glutMainLoop()
- 
- 
+
 
 if __name__ == "__main__":
 	main()
