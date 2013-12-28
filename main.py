@@ -17,6 +17,7 @@ from shaders import *
 from textures import *
 from controls import *
 
+from model_helicopter import *
 
 
 ####################### PARAMS ############################
@@ -28,8 +29,8 @@ skyR, skyG, skyB, skyA = 0.5, 0.7, 0.9, 0.0   # RGBA Color of the sky
 field = 100.0                                  # (-10, -10) to (10, 10) square
 platform =0.5                                 # (-0.5, -0.5) to (0.5, 0.5)
 ground_level = 0.2                            # z is down
-zoom = 0.0
-max_zoom, min_zoom = 0.0, 0.0
+zoom = 1.0
+max_zoom, min_zoom = 2.0, 0.5
 shiftZ = 0.0                                  # this is because the helicopter starts at (0,0,0) somewhere in the sky ... different for different files too
 grass_width = 2.0
 
@@ -37,7 +38,7 @@ camera_degrees = 45
 helicopterTime = 0
 wingsAngle = 0
 file = None
-camera_mode = "stationary"
+camera_mode = "follow"
 x, y, z, qx, qy, qz, qw, t = 0, 0, 0, 0, 0, 0, 0, 0
 time_adj, time_adj_flag = 0, False
 speed = 2
@@ -252,168 +253,23 @@ def display():
 
 	######################### Simple Helicopter #################
 
-	ambient = glGetUniformLocation(program, "ambient")
-	diffuse = glGetUniformLocation(program, "diffuse")
-	specular = glGetUniformLocation(program, "specular")
-	emission = glGetUniformLocation(program, "emission")
-	shininess = glGetUniformLocation(program, "shininess")
 
-	glPushMatrix()
-
-	# Flying the helicopter
-	glTranslatef(x, y, z)
-
-	angle = acos(qw) * 2.0
-	axisX = qx / sin (0.5 * angle)
-	axisY = qy / sin (0.5 * angle)
-	axisZ = qz / sin (0.5 * angle)
-
-
-	glRotatef(degrees(angle), axisX, axisY, axisZ)
-
-
-	# Helicopter head
-	glPushMatrix()
-	glUniform4fv(ambient, 1, numpy.array([0.3, 0.3, 0.4, 1.0], numpy.float32))
-	glUniform4fv(emission, 1, numpy.array([0.0, 0.0, 0.0, 1.0], numpy.float32))
-	glUniform4fv(diffuse, 1, numpy.array([0.2, 0.2, 0.5, 1.0], numpy.float32))
-	glUniform4fv(specular, 1, numpy.array([0.5, 0.5, 0.5, 1.0], numpy.float32))
-	glUniform1f(shininess, 2.0)
-	glutSolidSphere(0.15, 30, 30)
-	glPopMatrix()
-	
-	# Back wings
-	glPushMatrix()
-	glTranslatef(-0.38, .025, 0)
-	glRotate(wingsAngle, 0, 1, 0)
-	glRotate(45, 0, 1, 0)
-	glScalef(.25, .02, .05)
-	glutSolidCube(1)
-	glPopMatrix()
-
-	glPushMatrix()
-	glTranslatef(-0.38, -.025, 0)
-	glRotate(wingsAngle, 0, 1, 0)
-	glRotate(-45, 0, 1, 0)
-	glScalef(.25, .02, .05)
-	glutSolidCube(1)
-	glPopMatrix()
-
-	# Top wings
-	glPushMatrix()
-	glTranslatef(0, 0, -0.21)
-	glRotate(wingsAngle, 0, 0, -1)
-	glRotate(45, 0, 0, -1)
-	glScalef(.7, .06, .02)
-	glutSolidCube(1)
-	glPopMatrix()
-
-	glPushMatrix()
-	glTranslatef(0, 0, -0.21)
-	glRotate(wingsAngle, 0, 0, -1)
-	glRotate(-45, 0, 0, -1)
-	glScalef(.7, .06, .02)
-	glutSolidCube(1)
-	glPopMatrix()
-
-	# Helicopter Legs
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(0,-0.11,0.16)
-	glRotatef(90,0,1,0)
-	glTranslatef(0,0,-0.2)
-	gluCylinder(quadric, 0.03, 0.03, 0.4, 30, 30)
-	quadric = gluNewQuadric()
-	gluDisk(quadric, 0, 0.03, 30, 30)
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(0, 0, 0.4)
-	gluDisk(quadric, 0, 0.03, 30, 30)
-	glPopMatrix()
-	glPopMatrix()
-
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(0,0.11,0.16)
-	glRotatef(90,0,1,0)
-	glTranslatef(0,0,-0.2)
-	gluCylinder(quadric, 0.03, 0.03, 0.4, 30, 30)
-	quadric = gluNewQuadric()
-	gluDisk(quadric, 0, 0.03, 30, 30)
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(0, 0, 0.4)
-	gluDisk(quadric, 0, 0.03, 30, 30)
-	glPopMatrix()
-	glPopMatrix()
-
-
-	# Helicopter backbone
-	glPushMatrix()
-	glUniform4fv(ambient, 1, numpy.array([0.0, 0.0, 0.0, 1.0], numpy.float32))
-	glUniform4fv(emission, 1, numpy.array([0.0, 0.0, 0.0, 1.0], numpy.float32))
-	glUniform4fv(diffuse, 1, numpy.array([0.4, 0.4, 0.4, 1.0], numpy.float32))
-	glUniform4fv(specular, 1, numpy.array([0.5, 0.5, 0.5, 1.0], numpy.float32))
-	glUniform1f(shininess, 2.0)
-	glTranslatef(-0.25, 0, 0)
-	glScalef(.3, .03, .07)
-	glutSolidCube(1)
-	glPopMatrix()
-
-	# Helicopter Topbone
-	glPushMatrix()
-	glTranslatef(0, 0, -0.2)
-	quadric = gluNewQuadric()
-	gluCylinder(quadric, 0.04, 0.04, 0.115, 30, 30)
-	glPopMatrix()
-
-	#Helicopter Legbones
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(-0.06,-0.05,0.05)
-	glRotatef(-30,-1,0,0)
-	gluCylinder(quadric, 0.02, 0.02, 0.13, 30, 30)
-	glPopMatrix()
-
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(0.06,-0.05,0.05)
-	glRotatef(-30,-1,0,0)
-	gluCylinder(quadric, 0.02, 0.02, 0.13, 30, 30)
-	glPopMatrix()
-
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(-0.06,0.05,0.05)
-	glRotatef(30,-1,0,0)
-	gluCylinder(quadric, 0.02, 0.02, 0.13, 30, 30)
-	glPopMatrix()
-
-	glPushMatrix()
-	quadric = gluNewQuadric()
-	glTranslatef(0.06,0.05,0.05)
-	glRotatef(30,-1,0,0)
-	gluCylinder(quadric, 0.02, 0.02, 0.13, 30, 30)
-	glPopMatrix()
-
-	glPopMatrix()
-
+	data = [x, y, z, qx, qy, qz, qw]
+	createHelicopter(program, data, wingsAngle)
 	animateHelicopter()
 	glutSwapBuffers()
 
 
 def animateHelicopter():
 	global wingsAngle, helicopterTime
-	if (time.time() - helicopterTime) >= 0.02:         #10 ms == 100 fps
-		if not pause:
+	if (time.time() - helicopterTime) >= 0.02:         #20 ms == 50 fps
+		if not pause: 
 			wingsAngle += 45
 		helicopterTime = time.time()
 
 
 def keyPressed(*args):
 	global camera_degrees, zoom, speed, pause, stationary_camera_autolock
-	#if ord(args[0]) == 27: # Escape character
-	#	sys.exit()
 	if args[0].lower() == keyHash['quit']:
 		sys.exit()
 	if args[0].lower() == keyHash['left']:
@@ -441,7 +297,7 @@ def main():
 
 	global file, camera_mode, zoom, max_zoom, min_zoom, shiftZ
 
-	glutInit(sys.argv[0:1]) # dunno what this does...
+	glutInit(sys.argv[0:1])
 
 	if len(sys.argv) == 1:
 		print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> [-c <camera_mode>]."
@@ -458,28 +314,14 @@ def main():
 			except IOError:
 				print "Unable to open file: " + sys.argv[i+1] + "."
 				exit(1)
-
-		elif sys.argv[i] == "-c" :
-			try:
-				if sys.argv[i+1] not in ["stationary", "follow"]:
-					print "Illegal camera option: must choose either 'stationary' or 'follow'."
-					exit(1)
-				else:
-					camera_mode = sys.argv[i+1]
-					zoom, max_zoom, min_zoom = 0.5, 2.0, 0.5
-			except IndexError:
-				print "You must specify a camera option: either 'stationary' or 'follow'."
-				exit(1)
-
 		elif sys.argv[i] == "-z" :
 			try:
 				shiftZ = float(sys.argv[i+1])
 			except (ValueError, IndexError):
 				print "You must specify a numerical floating point value for the shift amount (positiveZ = down)."
 				exit(1)
-
 		else:
-			print "Illegal flag option; only -f <filename>, -c <camera_mode>, and -z <vertical_shift_amount> allowed."
+			print "Illegal flag option; only -f <filename> and -z <vertical_shift_amount> allowed."
 			exit(1)
 		i += 2
 
@@ -487,7 +329,6 @@ def main():
 	printHelp()
 
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-
 	glutInitWindowSize(screenW, screenH)
 	glutInitWindowPosition(0, 0)
 	
@@ -500,7 +341,6 @@ def main():
 	initGL(screenW, screenH)
 	glUseProgram(program)  
 	glutMainLoop()
-
 
 if __name__ == "__main__":
 	main()
