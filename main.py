@@ -180,22 +180,8 @@ def display():
 	glLoadIdentity()
 
 	########################### Camera ###########################
-	if camera_mode == "follow":
-		gluLookAt(-5*zoom*cos(radians(camera_degrees)) + x, 5*zoom*sin(radians(camera_degrees)) + y, -2*zoom + z, x, y, z, 0, 0, -1)
-	elif camera_mode == "stationary":
-		if stationary_camera_autolock:
-			magnitude = sqrt(x**2 + y**2)
-			cos_meas = x * 1.0 / magnitude if magnitude != 0 else 1.0
-			sin_meas = y * 1.0 / magnitude if magnitude != 0 else 0.0
-			camera_degrees = degrees(acos(cos_meas)) if sin_meas > 0.0 else -degrees(acos(cos_meas))
-			if magnitude != 0:
-				gluLookAt(0, 0, SCALE_CONSTANT*shiftZ, x * 1.0 / magnitude , y * 1.0 / magnitude, SCALE_CONSTANT*shiftZ-.8, 0, 0, -1)
-			else:
-				gluLookAt(0, 0, SCALE_CONSTANT*shiftZ, 0, 0, -1, 0, 0, -1)
-			stationary_camera_autolock = False
-		else:
-			gluLookAt(0, 0, SCALE_CONSTANT*shiftZ, cos(radians(camera_degrees)), sin(radians(camera_degrees)), SCALE_CONSTANT*shiftZ-.8, 0, 0, -1)
-
+	gluLookAt(-5*zoom*cos(radians(camera_degrees)) + x, 5*zoom*sin(radians(camera_degrees)) + y, -2*zoom + z, x, y, z, 0, 0, -1)
+	
 	########################### Lights ###########################
 	enablelighting = glGetUniformLocation(program, "enablelighting")
 	glUniform1f(enablelighting, 1)
