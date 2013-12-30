@@ -15,6 +15,7 @@ from shaders import *
 from textures import *
 from controls import *
 from model_helicopter import *
+from model_ground import *
 
 
 ####################### PARAMS ############################
@@ -23,9 +24,6 @@ screenW, screenH = 960, 960
 lightColor = numpy.array([0.9,0.9,0.9,1], numpy.float32)
 lightPosn = numpy.array([0.5, 0.5, -1, 0], numpy.float32)
 skyR, skyG, skyB, skyA = 0.5, 0.7, 0.9, 0.0   # RGBA Color of the sky
-field = 100.0                                  # (-10, -10) to (10, 10) square
-platform = 0.5                                 # (-0.5, -0.5) to (0.5, 0.5)
-ground_level = 0.2                            # z is down
 zoom = 1.0
 max_zoom, min_zoom = 2.0, 0.5
 shiftZ = 0.0                                  # this is because the helicopter starts at (0,0,0) somewhere in the sky ... different for different files too
@@ -176,58 +174,11 @@ def display():
 
 	isTex = glGetUniformLocation(program, "isTex")
 	glUniform1i(isTex, 1)
-
-
-	########################### Ground ##########################
-
-	glEnable(GL_TEXTURE_2D)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR) 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-	glBindTexture(GL_TEXTURE_2D, grassTex)
-
-	glBegin(GL_QUADS)
-	glTexCoord2f(0.0, field)
-	glVertex3f(-field, -field, shiftZ + ground_level)
-	glTexCoord2f(field, field)
-	glVertex3f(-field, field, shiftZ + ground_level)
-	glTexCoord2f(field, 0.0)
-	glVertex3f(field, field, shiftZ + ground_level)
-	glTexCoord2f(0.0, 0.0)
-	glVertex3f(field, -field, shiftZ + ground_level)
-	glEnd()
-
-	glDisable(GL_TEXTURE_2D)
-
-	########################## Platform #########################
-	glPushMatrix()
-	glRotatef(-90, 0, 0, 1)
-	glEnable(GL_TEXTURE_2D)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-	glBindTexture(GL_TEXTURE_2D, platformTex)
-
-	glBegin(GL_QUADS)
-	glTexCoord2f(0.0, 1.0)
-	glVertex3f(-platform, -platform, shiftZ + ground_level - 0.01)
-	glTexCoord2f(1.0, 1.0)
-	glVertex3f(-platform, platform, shiftZ + ground_level - 0.01)
-	glTexCoord2f(1.0, 0.0)
-	glVertex3f(platform, platform, shiftZ + ground_level - 0.01)
-	glTexCoord2f(0.0, 0.0)
-	glVertex3f(platform, -platform, shiftZ + ground_level - 0.01)
-	glEnd()
-
-	glDisable(GL_TEXTURE_2D)
-	glPopMatrix()
-
+	createGround(grassTex, shiftZ)
+	createPlatform(platformTex, shiftZ)
 	glUniform1i(isTex, 0)
 
 	######################### Simple Helicopter #################
-
 
 	data = [x, y, z, qx, qy, qz, qw]
 	createHelicopter(program, data)
@@ -257,12 +208,10 @@ def keyPressed(*args):
 	if args[0].lower() == keyHash['pause']:
 		pause = not pause
 
-
 def idleFunc():
 	glutPostRedisplay()
 
 def main():
-
 	global file, zoom, max_zoom, min_zoom, shiftZ
 
 	glutInit(sys.argv[0:1])
@@ -299,7 +248,6 @@ def main():
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
 	glutInitWindowSize(screenW, screenH)
 	glutInitWindowPosition(0, 0)
-	
 	window = glutCreateWindow("Helicopter Visualization")
 
 	glutDisplayFunc(display)
