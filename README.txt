@@ -48,8 +48,8 @@ Example, using the Stanford chaos dataset.
 
 python main.py -f data/stanford_helicopter_data/chaos/smoother.txt -p default_params.txt
 
-Alternatively, no specification of the params file defaults to the defaults_params.txt, so
-the above can be simplified as:
+Alternatively, no specification of the params file defaults to the defaults_params.txt,
+so the above can be simplified as:
 
 python main.py -f data/stanford/helicopter_data/chaos/smoother.txt
 
