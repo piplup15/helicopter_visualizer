@@ -33,7 +33,6 @@ grass_width = 2.0
 
 camera_degrees = 45
 helicopterTime = 0
-wingsAngle = 0
 file = None
 x, y, z, qx, qy, qz, qw, t = 0, 0, 0, 0, 0, 0, 0, 0
 time_adj, time_adj_flag = 0, False
@@ -231,17 +230,10 @@ def display():
 
 
 	data = [x, y, z, qx, qy, qz, qw]
-	createHelicopter(program, data, wingsAngle)
-	animateHelicopter()
+	createHelicopter(program, data)
+	animateHelicopter(helicopterTime, pause)
 	glutSwapBuffers()
 
-
-def animateHelicopter():
-	global wingsAngle, helicopterTime
-	if (time.time() - helicopterTime) >= 0.02:         #20 ms == 50 fps
-		if not pause: 
-			wingsAngle += 45
-		helicopterTime = time.time()
 
 #keyHash is a parameter in controls
 def keyPressed(*args):

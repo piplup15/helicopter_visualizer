@@ -6,10 +6,13 @@ from OpenGL.GLUT import *
  
 from OpenGL.GL.shaders import *
 from math import *
+import time
 import numpy
 
-def createHelicopter(program, data, wingsAngle):
+wingsAngle = 0
 
+def createHelicopter(program, data):
+	global wingsAngle
 	x,y,z,qx,qy,qz,qw = data
 
 	ambient = glGetUniformLocation(program, "ambient")
@@ -151,5 +154,12 @@ def createHelicopter(program, data, wingsAngle):
 	glRotatef(30,-1,0,0)
 	gluCylinder(quadric, 0.02, 0.02, 0.13, 30, 30)
 	glPopMatrix()
-
+	
 	glPopMatrix()
+
+def animateHelicopter(helicopterTime, pause):
+	global wingsAngle
+	if (time.time() - helicopterTime) >= 0.02:         #20 ms == 50 fps
+		if not pause: 
+			wingsAngle += 45
+		helicopterTime = time.time()
