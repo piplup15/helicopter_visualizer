@@ -17,31 +17,42 @@ from controls import *
 from model_helicopter import *
 from model_ground import *
 
-####################### PARAMS ############################
-visField = 85                                               # visField =
-screenW, screenH = 960, 960
+# Useful Parameters
+program = None
+datafile = None
+platformTex = None
+grassTex = None
+
+# Window Dimensions
+screenW = 960
+screenH = 960
+
+# Direction + Color of Light
 lightColor = numpy.array([0.9,0.9,0.9,1], numpy.float32)
 lightPosn = numpy.array([0.5, 0.5, -1, 0], numpy.float32)
-skyR, skyG, skyB, skyA = 0.5, 0.7, 0.9, 0.0   # RGBA Color of the sky
-zoom = 1.0
-max_zoom, min_zoom = 2.0, 0.5
-shiftZ = 0.0                                  # this is because the helicopter starts at (0,0,0) somewhere in the sky ... different for different files too
-grass_width = 2.0
 
+# Background Color
+skyR, skyG, skyB, skyA = 0.5, 0.7, 0.9, 0.0
+
+# Camera Parameters
+visField = 85
+min_zoom = 0.5
+zoom = 1.0 
+max_zoom = 2.0
 camera_degrees = 45
-helicopterTime = 0
-file = None
-x, y, z, qx, qy, qz, qw, t = 0, 0, 0, 0, 0, 0, 0, 0
-time_adj, time_adj_flag = 0, False
+
+# Controls Parameters
 speed = 2
 pause = False
-##############################################################
 
-####################### TEXTURES AND PROGRAM #############################
-grassTex = None
-platformTex = None
-program = None
-##########################################################################
+# Datafile Parameters
+
+shiftZ = 0.0  # Remember, positive Z points down
+helicopterTime = 0
+x, y, z, qx, qy, qz, qw, t = 0, 0, 0, 0, 0, 0, 0, 0
+time_adj, time_adj_flag = 0, False   # For files that have different starting times
+
+
   
 def initGL(w, h):
 	global grassTex, platformTex, program
@@ -85,11 +96,11 @@ def readData():
 	global time_adj, time_adj_flag
 
 	for i in range(0, speed-1):
-		line = file.readline() # just read some lines to speed things up if necessary.
-	line = file.readline()
+		line = datafile.readline() # just read some lines to speed things up if necessary.
+	line = datafile.readline()
 
 	if len(line) == 0:
-		file.close()
+		datafile.close()
 		print "Flight complete!"
 		sys.exit(0)
 	else:
@@ -199,7 +210,7 @@ def idleFunc():
 	glutPostRedisplay()
 
 def main():
-	global file, zoom, max_zoom, min_zoom, shiftZ
+	global datafile, zoom, max_zoom, min_zoom, shiftZ
 
 	glutInit(sys.argv[0:1])
 
@@ -211,7 +222,7 @@ def main():
 	while i < len(sys.argv):
 		if sys.argv[i] == "-f" :
 			try:
-				file = open(sys.argv[i+1])
+				datafile = open(sys.argv[i+1])
 			except IndexError:
 				print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> [-z <vertical_shift_amount>]."
 				exit(1)
