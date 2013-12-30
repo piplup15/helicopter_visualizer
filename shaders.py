@@ -80,7 +80,7 @@ def generateShaders():
 			            vec4 lightColor = lightcolor[i];
 			        
 			            //Directional lights
-			            if(lightposn[i][3] == 0){
+			            if(lightposn[i][3] == 0.0){
 			                vec3 currentPos = lightposn[i].xyz;
 			                direction = normalize(currentPos);
 			                halfVec = normalize(direction + eyedir);
