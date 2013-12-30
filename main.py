@@ -2,11 +2,9 @@ import OpenGL
 OpenGL.ERROR_ON_COPY = True 
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from OpenGL.GLUT import *
- 
+from OpenGL.GLUT import * 
 from OpenGL.GL.shaders import *
 from math import *
-import time, sys
 
 import PIL.Image
 import numpy
@@ -16,7 +14,6 @@ import sys
 from shaders import *
 from textures import *
 from controls import *
-
 from model_helicopter import *
 
 
@@ -27,7 +24,7 @@ lightColor = numpy.array([0.9,0.9,0.9,1], numpy.float32)
 lightPosn = numpy.array([0.5, 0.5, -1, 0], numpy.float32)
 skyR, skyG, skyB, skyA = 0.5, 0.7, 0.9, 0.0   # RGBA Color of the sky
 field = 100.0                                  # (-10, -10) to (10, 10) square
-platform =0.5                                 # (-0.5, -0.5) to (0.5, 0.5)
+platform = 0.5                                 # (-0.5, -0.5) to (0.5, 0.5)
 ground_level = 0.2                            # z is down
 zoom = 1.0
 max_zoom, min_zoom = 2.0, 0.5
@@ -38,14 +35,10 @@ camera_degrees = 45
 helicopterTime = 0
 wingsAngle = 0
 file = None
-camera_mode = "follow"
 x, y, z, qx, qy, qz, qw, t = 0, 0, 0, 0, 0, 0, 0, 0
 time_adj, time_adj_flag = 0, False
 speed = 2
 pause = False
-stationary_camera_autolock = True
-
-SCALE_CONSTANT = 1
 ##############################################################
 
 ####################### TEXTURES AND PROGRAM #############################
@@ -55,47 +48,43 @@ program = None
 ##########################################################################
   
 def initGL(w, h):
-    glClearColor(skyR, skyG, skyB, skyA)
-    glClearDepth(1.0)
-    glDepthFunc(GL_LESS)
-    glEnable(GL_DEPTH_TEST)
-    glShadeModel(GL_SMOOTH)
+	global grassTex, platformTex, program
+	glClearColor(skyR, skyG, skyB, skyA)
+	glClearDepth(1.0)
+	glDepthFunc(GL_LESS)
+	glEnable(GL_DEPTH_TEST)
+	glShadeModel(GL_SMOOTH)
 
-    helicopterTime = time.time()
-    update_timer = time.time()
- 
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(visField, float(w)/float(h), 0.1, 700.0)
-    glMatrixMode(GL_MODELVIEW)
-    glEnable(GL_DEPTH_TEST)
+	helicopterTime = time.time()
+	update_timer = time.time()
 
+	glMatrixMode(GL_PROJECTION)
+	glLoadIdentity()
+	gluPerspective(visField, float(w)/float(h), 0.1, 700.0)
+	glMatrixMode(GL_MODELVIEW)
+	glEnable(GL_DEPTH_TEST)
 
-    # load all textures:
-    global grassTex
-    grassTex = loadTexture("images/grass.jpg")
-    global platformTex
-    platformTex = loadTexture("images/helicopter_landing.jpg")
- 
-    if not glUseProgram:
-        print 'Missing Shader Objects!'
-        sys.exit(1)
- 
-    global program
-    program = generateShaders()
+	grassTex = loadTexture("images/grass.jpg")
+	platformTex = loadTexture("images/helicopter_landing.jpg")
+
+	if not glUseProgram:
+		print 'Missing Shader Objects!'
+		sys.exit(1)
+
+	program = generateShaders()
  
 
 def resize(w, h):
-    global screenW, screenH
-    if h < 400:  h = 400
-    if w < 400:  w = 400
-    screenW = w
-    screenH = h
-    glViewport(0, 0, w, h)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(visField, float(w)/float(h), 0.1, 700.0)
-    glMatrixMode(GL_MODELVIEW)
+	global screenW, screenH
+	if h < 400:  h = 400
+	if w < 400:  w = 400
+	screenW = w
+	screenH = h
+	glViewport(0, 0, w, h)
+	glMatrixMode(GL_PROJECTION)
+	glLoadIdentity()
+	gluPerspective(visField, float(w)/float(h), 0.1, 700.0)
+	glMatrixMode(GL_MODELVIEW)
  
 def readData():
 
@@ -134,20 +123,13 @@ def convert_standard(camera_degrees):
 
 def display():
 
-	global program, x, y, z, qx, qy, qz, qw, t, camera_degrees, stationary_camera_autolock
-
+	global program, x, y, z, qx, qy, qz, qw, t, camera_degrees
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-	# Printing vital text to the screen...
 
 	camera_degrees = convert_standard(camera_degrees)
 
 	if not pause:
 		x, y, z, qx, qy, qz, qw, t = readData()
-
-		x *= SCALE_CONSTANT
-		y *= SCALE_CONSTANT
-		z *= SCALE_CONSTANT
 
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
@@ -200,18 +182,22 @@ def display():
 	########################### Ground ##########################
 
 	glEnable(GL_TEXTURE_2D)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) ; 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR) ; 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT) ;
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT) ;
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) 
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR) 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
 	glBindTexture(GL_TEXTURE_2D, grassTex)
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, field); glVertex3f(-field, -field, SCALE_CONSTANT*shiftZ + ground_level);
-	glTexCoord2f(field, field); glVertex3f(-field, field, SCALE_CONSTANT*shiftZ + ground_level);
-	glTexCoord2f(field, 0.0); glVertex3f(field, field, SCALE_CONSTANT*shiftZ + ground_level);
-	glTexCoord2f(0.0, 0.0); glVertex3f(field, -field, SCALE_CONSTANT*shiftZ + ground_level);
-	glEnd();
+	glBegin(GL_QUADS)
+	glTexCoord2f(0.0, field)
+	glVertex3f(-field, -field, shiftZ + ground_level)
+	glTexCoord2f(field, field)
+	glVertex3f(-field, field, shiftZ + ground_level)
+	glTexCoord2f(field, 0.0)
+	glVertex3f(field, field, shiftZ + ground_level)
+	glTexCoord2f(0.0, 0.0)
+	glVertex3f(field, -field, shiftZ + ground_level)
+	glEnd()
 
 	glDisable(GL_TEXTURE_2D)
 
@@ -219,18 +205,22 @@ def display():
 	glPushMatrix()
 	glRotatef(-90, 0, 0, 1)
 	glEnable(GL_TEXTURE_2D)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) ; 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR) ; 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT) ;
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT) ;
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
 	glBindTexture(GL_TEXTURE_2D, platformTex)
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 1.0); glVertex3f(-platform, -platform, SCALE_CONSTANT*shiftZ + ground_level - 0.01);
-	glTexCoord2f(1.0, 1.0); glVertex3f(-platform, platform, SCALE_CONSTANT*shiftZ + ground_level - 0.01);
-	glTexCoord2f(1.0, 0.0); glVertex3f(platform, platform, SCALE_CONSTANT*shiftZ + ground_level - 0.01);
-	glTexCoord2f(0.0, 0.0); glVertex3f(platform, -platform, SCALE_CONSTANT*shiftZ + ground_level - 0.01);
-	glEnd();
+	glBegin(GL_QUADS)
+	glTexCoord2f(0.0, 1.0)
+	glVertex3f(-platform, -platform, shiftZ + ground_level - 0.01)
+	glTexCoord2f(1.0, 1.0)
+	glVertex3f(-platform, platform, shiftZ + ground_level - 0.01)
+	glTexCoord2f(1.0, 0.0)
+	glVertex3f(platform, platform, shiftZ + ground_level - 0.01)
+	glTexCoord2f(0.0, 0.0)
+	glVertex3f(platform, -platform, shiftZ + ground_level - 0.01)
+	glEnd()
 
 	glDisable(GL_TEXTURE_2D)
 	glPopMatrix()
@@ -253,9 +243,9 @@ def animateHelicopter():
 			wingsAngle += 45
 		helicopterTime = time.time()
 
-
+#keyHash is a parameter in controls
 def keyPressed(*args):
-	global camera_degrees, zoom, speed, pause, stationary_camera_autolock
+	global camera_degrees, zoom, speed, pause
 	if args[0].lower() == keyHash['quit']:
 		sys.exit()
 	if args[0].lower() == keyHash['left']:
@@ -281,12 +271,12 @@ def idleFunc():
 
 def main():
 
-	global file, camera_mode, zoom, max_zoom, min_zoom, shiftZ
+	global file, zoom, max_zoom, min_zoom, shiftZ
 
 	glutInit(sys.argv[0:1])
 
 	if len(sys.argv) == 1:
-		print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> [-c <camera_mode>]."
+		print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename>."
 		exit(1)
 
 	i = 1
@@ -295,7 +285,7 @@ def main():
 			try:
 				file = open(sys.argv[i+1])
 			except IndexError:
-				print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> [-c <camera_mode>] [-z <vertical_shift_amount>]."
+				print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> [-z <vertical_shift_amount>]."
 				exit(1)
 			except IOError:
 				print "Unable to open file: " + sys.argv[i+1] + "."
@@ -319,7 +309,7 @@ def main():
 	glutInitWindowPosition(0, 0)
 	
 	window = glutCreateWindow("Helicopter Visualization")
-  
+
 	glutDisplayFunc(display)
 	glutIdleFunc(idleFunc)
 	glutReshapeFunc(resize)
