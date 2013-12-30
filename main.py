@@ -17,7 +17,6 @@ from controls import *
 from model_helicopter import *
 from model_ground import *
 
-
 ####################### PARAMS ############################
 visField = 85                                               # visField =
 screenW, screenH = 960, 960
@@ -69,7 +68,6 @@ def initGL(w, h):
 		sys.exit(1)
 
 	program = generateShaders()
- 
 
 def resize(w, h):
 	global screenW, screenH
@@ -84,7 +82,6 @@ def resize(w, h):
 	glMatrixMode(GL_MODELVIEW)
  
 def readData():
-
 	global time_adj, time_adj_flag
 
 	for i in range(0, speed-1):
@@ -94,7 +91,7 @@ def readData():
 	if len(line) == 0:
 		file.close()
 		print "Flight complete!"
-		exit(0)
+		sys.exit(0)
 	else:
 		tokens = line.split()
 		retList = map(lambda x: float(x), tokens[2:9])
@@ -119,7 +116,6 @@ def convert_standard(camera_degrees):
 		return camera_degrees
 
 def display():
-
 	global program, x, y, z, qx, qy, qz, qw, t, camera_degrees
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -145,23 +141,18 @@ def display():
 	glutPrint(40, screenH - 270, GLUT_BITMAP_HELVETICA_18, "y: " + str(round(qy,2)), 0, 0, 0)
 	glutPrint(40, screenH - 300, GLUT_BITMAP_HELVETICA_18, "z: " + str(round(qz,2)), 0, 0, 0)
 	glutPrint(40, screenH - 330, GLUT_BITMAP_HELVETICA_18, "w: " + str(round(qw,2)), 0, 0, 0)
-	
 	glutPrint(screenW - 188, screenH - 40, GLUT_BITMAP_HELVETICA_18, "Camera Angle: " + str(round(camera_degrees, 0)), 0, 0, 0)
 	glutPrint(screenW - 128, screenH - 80, GLUT_BITMAP_HELVETICA_18, "Speed: " + str(speed * 0.5), 0, 0, 0)
-
 	glPopMatrix()
 
 	glMatrixMode(GL_MODELVIEW)
-	glLoadIdentity()
 
 	glEnable(GL_BLEND)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 	glLoadIdentity()
 
-	########################### Camera ###########################
 	gluLookAt(-5*zoom*cos(radians(camera_degrees)) + x, 5*zoom*sin(radians(camera_degrees)) + y, -2*zoom + z, x, y, z, 0, 0, -1)
 	
-	########################### Lights ###########################
 	enablelighting = glGetUniformLocation(program, "enablelighting")
 	glUniform1f(enablelighting, 1)
 	numused = glGetUniformLocation(program, "numused")
@@ -171,22 +162,18 @@ def display():
 	lightcol = glGetUniformLocation(program, "lightcolor")
 	glUniform4fv(lightcol, 1, lightColor)
 
-
 	isTex = glGetUniformLocation(program, "isTex")
 	glUniform1i(isTex, 1)
 	createGround(grassTex, shiftZ)
 	createPlatform(platformTex, shiftZ)
 	glUniform1i(isTex, 0)
 
-	######################### Simple Helicopter #################
-
 	data = [x, y, z, qx, qy, qz, qw]
 	createHelicopter(program, data)
 	animateHelicopter(helicopterTime, pause)
 	glutSwapBuffers()
 
-
-#keyHash is a parameter in controls
+#keyHash is a parameter in controls.py
 def keyPressed(*args):
 	global camera_degrees, zoom, speed, pause
 	if args[0].lower() == keyHash['quit']:
