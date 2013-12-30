@@ -237,7 +237,7 @@ def main():
 	glutInit(sys.argv[0:1])
 
 	if len(sys.argv) == 1:
-		print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> -p <params_filename>."
+		print "You must specify a file as input data for the visualizer. The command is: python main.py -f <filename> -p <params_filename>."
 		exit(1)
 
 	i = 1
@@ -248,7 +248,7 @@ def main():
 				datafilename = sys.argv[i+1]
 				datafile = open(datafilename)
 			except IndexError:
-				print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> -p <params_filename>."
+				print "You must specify a file as input data for the visualizer. The command is: python main.py -f <filename> -p <params_filename>."
 				exit(1)
 			except IOError:
 				print "Unable to open file: " + sys.argv[i+1] + "."
@@ -256,8 +256,10 @@ def main():
 		elif sys.argv[i] == "-p" :
 			try:
 				paramsfilename = sys.argv[i+1]
+				tmpFile = open(paramsfilename)
+				tmpFile.close()
 			except IndexError:
-				print "You must specify a params file as the parameter for the -p flag. The command is: python helicopter_vis.py -f <filename> -p <params_filename>."
+				print "You must specify a params file as the parameter for the -p flag. The command is: python main.py -f <filename> -p <params_filename>."
 				exit(1)
 			except IOError:
 				print "Unable to open file: " + sys.argv[i+1] + "."
