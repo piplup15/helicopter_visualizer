@@ -51,7 +51,7 @@ python main.py -f data/stanford_helicopter_data/chaos/smoother.txt -p default_pa
 Alternatively, no specification of the params file defaults to the defaults_params.txt,
 so the above can be simplified as:
 
-python main.py -f data/stanford/helicopter_data/chaos/smoother.txt
+python main.py -f data/stanford_helicopter_data/chaos/smoother.txt
 
 ======================================================================================
 
