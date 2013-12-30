@@ -1,0 +1,18 @@
+
+# This is a default params file.
+# Required fields are shown below and must be named as shown below.
+# The XX_col parameters refer to the column in the data file that corresponds to the XX part, indexed from 0.
+# The z_start variable define the starting height of the flight. Remember that positive z points down!
+
+# Comments must begin with a hashtag (#)
+
+x_col   2
+y_col   3
+z_col   4
+qx_col  5
+qy_col  6
+qz_col  7
+qw_col  8
+t_col   1
+
+z_start -25

@@ -37,7 +37,7 @@ skyR, skyG, skyB, skyA = 0.5, 0.7, 0.9, 0.0
 # Camera Parameters
 visField = 85
 min_zoom = 0.5
-zoom = 1.0 
+zoom = 0.8 
 max_zoom = 2.0
 camera_degrees = 45
 
@@ -46,12 +46,12 @@ speed = 2
 pause = False
 
 # Datafile Parameters
-
-shiftZ = 0.0  # Remember, positive Z points down
 helicopterTime = 0
 x, y, z, qx, qy, qz, qw, t = 0, 0, 0, 0, 0, 0, 0, 0
 time_adj, time_adj_flag = 0, False   # For files that have different starting times
 
+#Paramfile Parameters
+params = {}
 
   
 def initGL(w, h):
@@ -105,8 +105,15 @@ def readData():
 		sys.exit(0)
 	else:
 		tokens = line.split()
-		retList = map(lambda x: float(x), tokens[2:9])
-		retList.append(float(tokens[1]))
+		retList = []
+		retList.append(float(tokens[params["x_col"]]))
+		retList.append(float(tokens[params["y_col"]]))
+		retList.append(float(tokens[params["z_col"]]))
+		retList.append(float(tokens[params["qx_col"]]))
+		retList.append(float(tokens[params["qy_col"]]))
+		retList.append(float(tokens[params["qz_col"]]))
+		retList.append(float(tokens[params["qw_col"]]))
+		retList.append(float(tokens[params["t_col"]]))
 		if not time_adj_flag:
 			time_adj_flag = True
 			time_adj = float(tokens[1])
@@ -137,7 +144,7 @@ def display():
 
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
-
+	
 	glMatrixMode(GL_PROJECTION)
 	glPushMatrix()
 	glLoadIdentity()
@@ -175,8 +182,8 @@ def display():
 
 	isTex = glGetUniformLocation(program, "isTex")
 	glUniform1i(isTex, 1)
-	createGround(grassTex, shiftZ)
-	createPlatform(platformTex, shiftZ)
+	createGround(grassTex, params["z_start"])
+	createPlatform(platformTex, params["z_start"])
 	glUniform1i(isTex, 0)
 
 	data = [x, y, z, qx, qy, qz, qw]
@@ -209,36 +216,61 @@ def keyPressed(*args):
 def idleFunc():
 	glutPostRedisplay()
 
+def parseParams(paramsfilename):
+	global params
+	paramFile = open(paramsfilename)
+	line = paramFile.readline()
+	while len(line) != 0:
+		line = line.strip().split()
+		if len(line) == 2 and line[0] != "#":
+			try:
+				params[line[0]] = int(line[1])
+			except:
+				print "Malformed value for parameter: " + line[0]
+				exit(1)
+		line = paramFile.readline()
+	paramFile.close()
+
 def main():
-	global datafile, zoom, max_zoom, min_zoom, shiftZ
+	global datafile, zoom, max_zoom, min_zoom
 
 	glutInit(sys.argv[0:1])
 
 	if len(sys.argv) == 1:
-		print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename>."
+		print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> -p <params_filename>."
 		exit(1)
 
 	i = 1
 	while i < len(sys.argv):
+		paramsfilename = "default_params.txt"
 		if sys.argv[i] == "-f" :
 			try:
-				datafile = open(sys.argv[i+1])
+				datafilename = sys.argv[i+1]
+				datafile = open(datafilename)
 			except IndexError:
-				print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> [-z <vertical_shift_amount>]."
+				print "You must specify a file as input data for the visualizer. The command is: python helicopter_vis.py -f <filename> -p <params_filename>."
 				exit(1)
 			except IOError:
 				print "Unable to open file: " + sys.argv[i+1] + "."
 				exit(1)
-		elif sys.argv[i] == "-z" :
+		elif sys.argv[i] == "-p" :
 			try:
-				shiftZ = float(sys.argv[i+1])
-			except (ValueError, IndexError):
-				print "You must specify a numerical floating point value for the shift amount (positiveZ = down)."
+				paramsfilename = sys.argv[i+1]
+			except IndexError:
+				print "You must specify a params file as the parameter for the -p flag. The command is: python helicopter_vis.py -f <filename> -p <params_filename>."
+				exit(1)
+			except IOError:
+				print "Unable to open file: " + sys.argv[i+1] + "."
 				exit(1)
 		else:
-			print "Illegal flag option; only -f <filename> and -z <vertical_shift_amount> allowed."
+			print "Illegal flag option; only -f <filename> and -p <params_filename> allowed."
 			exit(1)
 		i += 2
+
+	print "Opened flight data file: " + datafilename + "."
+	print "Opened params file: " + paramsfilename + "."
+	print ""
+	parseParams(paramsfilename)
 
 	loadKeys()
 	printHelp()
