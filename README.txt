@@ -36,7 +36,7 @@ The files included in this program are:
 (4) shaders.py - includes standard vertex + fragment shaders for OpenGL
 (5) textures.py - includes simple implementation for texturing
 (6) model_helicopter.py - a simple helicopter created in OpenGL
-(7) model_ground.py - a simple flat ground cretaed in OpenGL
+(7) model_ground.py - a simple flat ground created in OpenGL
 
 =======================================================================================
 
