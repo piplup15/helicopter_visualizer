@@ -42,7 +42,9 @@ The files included in this program are:
 
 The command to run the program is:
 
-python main.py -f <datafilename> -p <paramsfilename>
+python main.py -f <path_to_data_file> -p <path_to_params_file>
+
+Make sure you run this command in the root directory.
 
 Example, using the Stanford chaos dataset.
 
