@@ -50,7 +50,7 @@ Example, using the Stanford chaos dataset.
 
 python main.py -f data/stanford_helicopter_data/chaos/smoother.txt -p default_params.txt
 
-Alternatively, no specification of the params file defaults to the parameter file inside,
+Alternatively, no specification of the params file defaults to the parameter file inside
 default_params.txt, so the above can be simplified as:
 
 python main.py -f data/stanford_helicopter_data/chaos/smoother.txt
